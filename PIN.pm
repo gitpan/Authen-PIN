@@ -2,12 +2,13 @@ package Authen::PIN;
 
 use Digest::MD5 qw(md5);
 use Business::CreditCard;
+use Number::Encode qw(uniform);
 
 use Carp;
 use strict;
 use vars qw($VERSION);
 
-our $VERSION = '1.00';
+our $VERSION = '1.10';
 
 sub new {
     my $type = shift;
@@ -85,30 +86,7 @@ sub pin {
 	$self->{count} += $self->{inc};
     }
 
-    my $char = 0;
-    my $bits = 0;
-
-    for my $c (split(//, md5($pas . $ser)))
-    {
-	for my $b (reverse 0 .. 7) {
-
-	    my $pro = $char * 2 + vec($c, $b, 1);
-
-	    if ($bits == 4 or ($pro > 7 and $pro != 8 and $pro != 9)) {
-		$hsh .= chr(ord('0') + $char);
-		$char = 0;
-		$bits = 0;
-	    }
-
-	    $char *= 2;
-	    $char += vec($c, $b, 1);
-	    ++ $bits;
-	}
-	
-    }
-
-    $hsh .= chr(ord('0') + $char)
-	if $bits;
+    $hsh = uniform(md5($pas . $ser));
 
     if (defined $pas and length($pas) < $self->{p}) {
 	$pas = (0 x ($self->{p} - length($pas))) . $pas;
@@ -231,6 +209,10 @@ Luis E. Munoz <lem@cantv.net>
 
 =item 1.00  Fri Jan 12 15:51:03 2001
     original version; created by h2xs 1.19
+
+=item 1.10  Thu Mar 01 18:15:00 2001
+    modified to use Number::Encode to achieve a more robust PIN digit
+    distribution
 
 
 =back

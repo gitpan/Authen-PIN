@@ -7,5 +7,6 @@ WriteMakefile(
 	      'PREREQ_PM' => {
 		  'Business::CreditCard' => 0,
 		  'Digest::MD5' => 0,
+		  'Number::Encode' => 0,
 	      },
 );
